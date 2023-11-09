@@ -1,6 +1,6 @@
 r-ape
 r-phangorn
-bioconductor-Biostrings
+bioconductor-biostrings
 r-optparse
 
 
