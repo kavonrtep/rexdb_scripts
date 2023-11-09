@@ -15,8 +15,12 @@ option_list <-  list(
   make_option(c("-n", "--n_threads"), type="integer", default=8,
               help="number of threads, default 8"),
   make_option(c("-t", "--tree"), type="character", default=NULL,
-              help="tree file from mafft (optional)")
+              help="tree file from mafft (optional)"),
+  make_option(c("-A", "--auto_threshold"), type="logical", default=FALSE,
+              help="use automatic threshold estimation", action = "store_true"
   )
+)
+
 
 opt_parser <-  OptionParser(option_list=option_list)
 opt <-  parse_args(opt_parser)
@@ -112,10 +116,13 @@ second_derivative <- predict(spline_fit, deriv = 2)
 inflection_points <- which(diff(sign(second_derivative$y)) != 0)
 posible_thresholds <- max(node_heights) + spline_fit$x[inflection_points]
 
-autothreshold <- posible_thresholds[which.min(abs(posible_thresholds - max(node_heights) * opt$cutoff))]
-print(autothreshold)
+autothreshold <- posible_thresholds[which.min(abs(posible_thresholds - max(node_heights) * 0.5))]
 
-threshold <- max(node_heights) * opt$cutoff
+if (opt$auto_threshold) {
+  threshold <- autothreshold
+} else {
+  threshold <- max(node_heights) * opt$cutoff
+}
 #threshold <- autothreshold
 
 #Identify the internal nodes that are closer to the root than the threshold
@@ -175,8 +182,8 @@ tipcolor <- ifelse(as.numeric(gsub("_.+", "", phylo_tree$tip.label)) %in% which(
 pngout <- paste0(opt$output, "_tree.png")
 png(pngout, width = 4000, height = 3000)
 plot(phylo_tree, show.node.label = TRUE, tip.color = tipcolor, cex = 1.5, type= "t")
-abline(v = threshold, col = "red")
-abline(v = posible_thresholds, col = "blue")
+abline(v = threshold, col = "red", lwd = 2)
+abline(v = autothreshold, col = "blue")
 xmax <- max(node_heights)
 # recalculate scale , xmax is at 1
 at <- seq(0, xmax, length.out = 11)
