@@ -1,4 +1,6 @@
 r-ape
 r-phangorn
-r-Biostrings
-r-parallel
+bioconductor-Biostrings
+r-optparse
+
+
