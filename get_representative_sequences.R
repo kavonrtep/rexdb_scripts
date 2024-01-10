@@ -109,9 +109,22 @@ s <- readAAStringSet(fin)
 node_heights <- node.depth.edgelength(phylo_tree)
 
 # try to estimate suitable cutoff
-
+plot.phylo(phylo_tree, show.node.label = FALSE, cex = 1.5, type= "t")
 ltt_data <- ltt.plot.coords(phylo_tree)
-spline_fit <- smooth.spline(ltt_data[,1], ltt_data[,2], spar = 1)
+save.image("tmp/tmp.RData")
+# try first with default parameters, if it fails, try with tol=1e-6
+
+spline_fit <- tryCatch({
+  smooth.spline(ltt_data[,1], ltt_data[,2], spar = 1)
+}, error = function(e) {
+  smooth.spline(ltt_data[,1], ltt_data[,2], spar = 1, tol=1e-6)
+})
+
+
+# spline_fit <- smooth.spline(ltt_data[,1], ltt_data[,2], spar = 1)
+# spline_fit <- smooth.spline(ltt_data[,1], ltt_data[,2], spar = 1, tol=1e-6)
+
+
 second_derivative <- predict(spline_fit, deriv = 2)
 inflection_points <- which(diff(sign(second_derivative$y)) != 0)
 posible_thresholds <- max(node_heights) + spline_fit$x[inflection_points]
