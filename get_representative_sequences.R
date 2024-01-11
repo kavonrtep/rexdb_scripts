@@ -18,6 +18,9 @@ option_list <-  list(
               help="tree file from mafft (optional)"),
   make_option(c("-A", "--auto_threshold"), type="logical", default=FALSE,
               help="use automatic threshold estimation", action = "store_true"
+  ),
+  make_option(c("-d", "--debug"), type="logical", default=FALSE,
+              help="debug mode", action = "store_true"
   )
 )
 
@@ -108,10 +111,12 @@ s <- readAAStringSet(fin)
 # Calculate the distance from the root to each node
 node_heights <- node.depth.edgelength(phylo_tree)
 
+
 # try to estimate suitable cutoff
-plot.phylo(phylo_tree, show.node.label = FALSE, cex = 1.5, type= "t")
 ltt_data <- ltt.plot.coords(phylo_tree)
-save.image("tmp/tmp.RData")
+if (opt$debug){
+  save.image(paste0(opt$output, "_data.RData")
+}
 # try first with default parameters, if it fails, try with tol=1e-6
 
 spline_fit <- tryCatch({
